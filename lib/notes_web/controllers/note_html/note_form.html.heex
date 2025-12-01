@@ -1,0 +1,16 @@
+<.form :let={f} for={@changeset} action={@action}>
+  <.input field={f[:title]} type="text" label="Title" />
+  <.input field={f[:content]} type="text" label="Content" />
+  <.input field={f[:public]} type="checkbox" label="Public" />
+  <.input
+    field={f[:type]}
+    type="select"
+    label="Type"
+    prompt="Choose a value"
+    options={Ecto.Enum.values(Notes.Content.Note, :type)}
+  />
+  <footer>
+    <.button variant="primary">Save Note</.button>
+    <.button :if={@return_to} href={@return_to}>Cancel</.button>
+  </footer>
+</.form>

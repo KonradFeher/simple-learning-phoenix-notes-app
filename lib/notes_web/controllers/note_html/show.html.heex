@@ -1,0 +1,21 @@
+<Layouts.app flash={@flash} current_scope={@current_scope}>
+  <.header>
+    Note {@note.id}
+    <:subtitle>This is a note record from your database.</:subtitle>
+    <:actions>
+      <.button navigate={~p"/notes"}>
+        <.icon name="hero-arrow-left" />
+      </.button>
+      <.button variant="primary" navigate={~p"/notes/#{@note}/edit?return_to=show"}>
+        <.icon name="hero-pencil-square" /> Edit note
+      </.button>
+    </:actions>
+  </.header>
+
+  <.list>
+    <:item title="Title">{@note.title}</:item>
+    <:item title="Content">{@note.content}</:item>
+    <:item title="Public">{@note.public}</:item>
+    <:item title="Type">{@note.type}</:item>
+  </.list>
+</Layouts.app>

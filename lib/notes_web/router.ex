@@ -71,5 +71,7 @@ defmodule NotesWeb.Router do
 
     post "/users/log-in", UserSessionController, :create
     delete "/users/log-out", UserSessionController, :delete
+
+    resources "/notes", NoteController
   end
 end
