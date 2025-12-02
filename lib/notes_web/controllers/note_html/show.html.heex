@@ -1,21 +1,83 @@
 <Layouts.app flash={@flash} current_scope={@current_scope}>
   <.header>
-    Note {@note.id}
-    <:subtitle>This is a note record from your database.</:subtitle>
+    {@note.title}
+    <:subtitle>A note crated by: <span class="italic">{@owner.name}</span></:subtitle>
     <:actions>
       <.button navigate={~p"/notes"}>
         <.icon name="hero-arrow-left" />
       </.button>
-      <.button variant="primary" navigate={~p"/notes/#{@note}/edit?return_to=show"}>
+      <.button
+        :if={@can_modify}
+        variant="primary"
+        navigate={~p"/notes/#{@note}/edit?return_to=show"}
+      >
         <.icon name="hero-pencil-square" /> Edit note
       </.button>
     </:actions>
   </.header>
 
+  <div class="min-h-12 p-4 rounded bg-base-200">
+    <%= if @note.type do %>
+      <div class="prose prose-sm">{raw(Earmark.as_html!(@note.content))}</div>
+    <% else %>
+      <div class="whitespace-pre-wrap">{@note.content}</div>
+    <% end %>
+  </div>
+  
   <.list>
-    <:item title="Title">{@note.title}</:item>
-    <:item title="Content">{@note.content}</:item>
-    <:item title="Public">{@note.public}</:item>
+    <:item title="Privacy">{if @note.public, do: "Public", else: "Private"}</:item>
     <:item title="Type">{@note.type}</:item>
   </.list>
+
+  <div class="my-8 p-4 rounded bg-base-200">
+    <div>
+      <h3 class="font-semibold mb-2">Authors</h3>
+      <ul>
+        <li>
+          <.user_badge user={@owner} owner={true} />
+        </li>
+        <%= for author <- @note.authors do %>
+          <li>
+            <.user_badge user={author} />
+            <.link
+              :if={@current_scope && owner?(@current_scope.user, @note)}
+              href={~p"/notes/#{@note}/remove_author/#{author.id}"}
+              data-confirm="Remove this author?"
+              method="delete"
+              class="text-warning hover:underline"
+            >
+              Remove
+            </.link>
+          </li>
+        <% end %>
+      </ul>
+    </div>
+
+    <div :if={@current_scope && owner?(@current_scope.user, @note)} class="my-4">
+      <h3 class="font-semibold mb-2">Add Author</h3>
+
+      <.form
+        :let={f}
+        for={%{"user_id" => nil}}
+        action={~p"/notes/#{@note.id}/add_author"}
+        method="put"
+      >
+        <.input
+          field={f[:user_id]}
+          type="select"
+          label="User"
+          options={
+            @users
+            |> Enum.reject(fn user ->
+              Enum.any?(@note.authors, fn author -> author.id == user.id end)
+            end)
+            |> Enum.map(fn user -> {user.name || user.email, user.id} end)
+          }
+        />
+        <.button type="submit">
+          <.icon name="hero-plus" class="w-4 h-4 mr-1" /> Add
+        </.button>
+      </.form>
+    </div>
+  </div>
 </Layouts.app>

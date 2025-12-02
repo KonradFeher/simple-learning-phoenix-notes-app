@@ -8,6 +8,7 @@ defmodule Notes.Content do
 
   alias Notes.Content.Note
   alias Notes.Accounts.Scope
+  alias Notes.Accounts.User
 
   @doc """
   Subscribes to scoped notifications about any note changes.
@@ -41,7 +42,20 @@ defmodule Notes.Content do
 
   """
   def list_notes(%Scope{} = scope) do
-    Repo.all_by(Note, user_id: scope.user.id)
+    query = from n in Note,
+              distinct: true,
+              left_join: a in assoc(n, :authors),
+              left_join: s in assoc(n, :sharees),
+              where: n.user_id == ^scope.user.id
+                or a.id == ^scope.user.id
+                or s.id == ^scope.user.id
+                or n.public == true,
+              order_by: n.title
+    Repo.all(query) |> Repo.preload([:authors, :sharees])
+  end
+
+  def list_notes(nil) do
+    Repo.all_by(Note, public: true)
   end
 
   @doc """
@@ -58,8 +72,29 @@ defmodule Notes.Content do
       ** (Ecto.NoResultsError)
 
   """
+
   def get_note!(%Scope{} = scope, id) do
-    Repo.get_by!(Note, id: id, user_id: scope.user.id)
+    note =
+      Note
+      |> Repo.get!(id)
+      |> Repo.preload([:authors, :sharees])
+    if allowed_to_view?(note, scope.user.id) do
+      note
+    else
+      {:error, :forbidden}
+    end
+  end
+
+  def get_note!(nil, id) do
+    note =
+      Note
+      |> Repo.get!(id)
+      |> Repo.preload([:authors, :sharees])
+    if note.public do
+      note
+    else
+      {:error, :forbidden}
+    end
   end
 
   @doc """
@@ -77,7 +112,8 @@ defmodule Notes.Content do
   def create_note(%Scope{} = scope, attrs) do
     with {:ok, note = %Note{}} <-
            %Note{}
-           |> Note.changeset(attrs, scope)
+           |> Note.changeset(attrs)
+           |> Ecto.Changeset.change(%{user_id: scope.user.id})
            |> Repo.insert() do
       broadcast_note(scope, {:created, note})
       {:ok, note}
@@ -97,14 +133,16 @@ defmodule Notes.Content do
 
   """
   def update_note(%Scope{} = scope, %Note{} = note, attrs) do
-    true = note.user_id == scope.user.id
-
-    with {:ok, note = %Note{}} <-
-           note
-           |> Note.changeset(attrs, scope)
-           |> Repo.update() do
-      broadcast_note(scope, {:updated, note})
-      {:ok, note}
+    if not allowed_to_modify?(note, scope.user.id) do
+      {:error, :forbidden}
+    else
+      with {:ok, note = %Note{}} <-
+            note
+            |> Note.changeset(attrs)
+            |> Repo.update() do
+        broadcast_note(scope, {:updated, note})
+        {:ok, note}
+      end
     end
   end
 
@@ -131,6 +169,95 @@ defmodule Notes.Content do
   end
 
   @doc """
+  Adds an author to a Note.
+  """
+  def add_author(note_id, new_author_id, acting_user_id) do
+    note =
+      Note
+      |> Repo.get!(note_id)
+      |> Repo.preload(:authors)
+
+    if not allowed_to_modify?(note, acting_user_id) do
+      {:error, :forbidden}
+    else
+      user = Repo.get!(User, new_author_id)
+
+      changeset =
+        note
+        |> Ecto.Changeset.change()
+        |> Ecto.Changeset.put_assoc(:authors, note.authors ++ [user])
+
+      Repo.update(changeset)
+    end
+  end
+
+  @doc """
+  Removes an author from a Note.
+  """
+  def remove_author(note_id, author_id, acting_user_id) do
+    note =
+      Note
+      |> Repo.get!(note_id)
+      |> Repo.preload(:authors)
+
+    if note.user_id != acting_user_id, do: {:error, :forbidden}
+
+    author_id = String.to_integer(author_id)
+    new_authors = Enum.reject(note.authors, &(&1.id == author_id))
+
+    changeset =
+      note
+      |> Ecto.Changeset.change()
+      |> Ecto.Changeset.put_assoc(:authors, IO.inspect(new_authors))
+
+    Repo.update(changeset)
+  end
+
+
+  @doc """
+  Adds a sharee to a Note.
+  """
+  def add_sharee(note_id, new_sharee_id, acting_user_id) do
+    note =
+      Note
+      |> Repo.get!(note_id)
+      |> Repo.preload(:sharees)
+
+    if not allowed_to_modify?(note, acting_user_id), do: {:error, :forbidden}
+
+    user = Repo.get!(User, new_sharee_id)
+
+    changeset =
+      note
+      |> Ecto.Changeset.change()
+      |> Ecto.Changeset.put_assoc(:sharees, note.sharees ++ [user])
+
+    Repo.update(changeset)
+  end
+
+  @doc """
+  Removes a sharee from a Note.
+  """
+  def remove_sharee(note_id, sharee_id, acting_user_id) do
+    note =
+      Note
+      |> Repo.get!(note_id)
+      |> Repo.preload(:sharees)
+
+    if not allowed_to_modify?(note, acting_user_id), do: {:error, :forbidden}
+
+    sharee_id = String.to_integer(sharee_id)
+    new_sharees = Enum.reject(note.sharees, &(&1.id == sharee_id))
+
+    changeset =
+      note
+      |> Ecto.Changeset.change()
+      |> Ecto.Changeset.put_assoc(:sharees, new_sharees)
+
+    Repo.update(changeset)
+  end
+
+  @doc """
   Returns an `%Ecto.Changeset{}` for tracking note changes.
 
   ## Examples
@@ -140,8 +267,17 @@ defmodule Notes.Content do
 
   """
   def change_note(%Scope{} = scope, %Note{} = note, attrs \\ %{}) do
-    true = note.user_id == scope.user.id
+    if not allowed_to_modify?(note, scope.user.id), do: {:error, :forbidden}
 
-    Note.changeset(note, attrs, scope)
+    Note.changeset(note, attrs)
   end
+
+  def allowed_to_modify?(note, user_id) do
+    note.user_id == user_id or Enum.any?(note.authors, &(&1.id == user_id))
+  end
+
+  def allowed_to_view?(note, user_id) do
+    allowed_to_modify?(note, user_id) or note.public or Enum.any?(note.sharees, &(&1.id == user_id))
+  end
+
 end

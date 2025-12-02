@@ -2,7 +2,7 @@
   <.header>
     Listing Notes
     <:actions>
-      <.button href={~p"/notes/new"}>
+      <.button :if={@current_scope != nil} href={~p"/notes/new"}>
         <.icon name="hero-plus" /> New Note
       </.button>
     </:actions>
@@ -10,17 +10,44 @@
 
   <.table id="notes" rows={@notes} row_click={&JS.navigate(~p"/notes/#{&1}")}>
     <:col :let={note} label="Title">{note.title}</:col>
-    <:col :let={note} label="Content">{note.content}</:col>
-    <:col :let={note} label="Public">{note.public}</:col>
+    <:col :let={note} label="Content">
+      {content = String.slice(note.content, 0..10)
+
+      case note.type do
+        :markdown -> raw(Earmark.as_html!(content))
+        _ -> content
+      end}...
+    </:col>
+    <:col :let={note} label="Public">
+      <.icon name={if note.public, do: "hero-check", else: "hero-lock-closed"} />
+    </:col>
     <:col :let={note} label="Type">{note.type}</:col>
+    <:col :let={note} label="Owner" >
+      {current_user_name = @current_scope && @current_scope.user.name
+
+      case Enum.find(@users, &(&1.id == note.user_id)).name do
+        ^current_user_name -> "You"
+        other -> other
+      end}
+    </:col>
     <:action :let={note}>
       <div class="sr-only">
         <.link navigate={~p"/notes/#{note}"}>Show</.link>
       </div>
-      <.link navigate={~p"/notes/#{note}/edit"}>Edit</.link>
+      <.link
+        :if={@current_scope && Enum.find(note.authors, &(@current_scope.user == &1))}
+        navigate={~p"/notes/#{note}/edit"}
+      >
+        Edit
+      </.link>
     </:action>
     <:action :let={note}>
-      <.link href={~p"/notes/#{note}"} method="delete" data-confirm="Are you sure?">
+      <.link
+        :if={@current_scope && owner?(@current_scope.user, note)}
+        href={~p"/notes/#{note}"}
+        method="delete"
+        data-confirm="Are you sure?"
+      >
         Delete
       </.link>
     </:action>

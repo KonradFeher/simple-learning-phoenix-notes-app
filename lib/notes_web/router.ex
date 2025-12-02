@@ -20,6 +20,7 @@ defmodule NotesWeb.Router do
   scope "/", NotesWeb do
     pipe_through :browser
 
+    resources "/notes", NoteController
     get "/", PageController, :home
   end
 
@@ -57,6 +58,11 @@ defmodule NotesWeb.Router do
     end
 
     post "/users/update-password", UserSessionController, :update_password
+
+    put "/notes/:note_id/add_author", NoteController, :add_author
+    put "/notes/:note_id/add_sharee", NoteController, :add_sharee
+    delete "/notes/:note_id/remove_author/:user_id", NoteController, :remove_author
+    delete "/notes/:note_id/remove_sharee/:user_id", NoteController, :remove_sharee
   end
 
   scope "/", NotesWeb do
@@ -71,7 +77,5 @@ defmodule NotesWeb.Router do
 
     post "/users/log-in", UserSessionController, :create
     delete "/users/log-out", UserSessionController, :delete
-
-    resources "/notes", NoteController
   end
 end

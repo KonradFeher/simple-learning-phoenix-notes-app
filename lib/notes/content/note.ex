@@ -9,17 +9,20 @@ defmodule Notes.Content.Note do
     field :type, Ecto.Enum, values: [:plaintext, :markdown, :checklist]
     field :user_id, :id
 
-    many_to_many :authors, Notes.Accounts.User, join_through: "notes_authors"
-    many_to_many :sharees, Notes.Accounts.User, join_through: "notes_sharees"
+    many_to_many :authors, Notes.Accounts.User,
+      join_through: "notes_authors",
+      on_replace: :delete
+    many_to_many :sharees, Notes.Accounts.User,
+     join_through: "notes_sharees",
+      on_replace: :delete
 
     timestamps(type: :utc_datetime)
   end
 
   @doc false
-  def changeset(note, attrs, user_scope) do
+  def changeset(note, attrs \\ %{}) do
     note
     |> cast(attrs, [:title, :content, :public, :type])
     |> validate_required([:title, :content, :public, :type])
-    |> put_change(:user_id, user_scope.user.id)
   end
 end

@@ -4,6 +4,7 @@ defmodule Notes.Accounts.User do
 
   schema "users" do
     field :email, :string
+    field :name , :string
     field :password, :string, virtual: true, redact: true
     field :hashed_password, :string, redact: true
     field :confirmed_at, :utc_datetime

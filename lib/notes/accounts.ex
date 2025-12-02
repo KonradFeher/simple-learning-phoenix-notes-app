@@ -111,6 +111,15 @@ defmodule Notes.Accounts do
     User.email_changeset(user, attrs, opts)
   end
 
+
+  @doc """
+  Returns the list of users.
+  """
+  def list_users() do
+    Repo.all(User)
+  end
+
+
   @doc """
   Updates the user email using the given token.
 

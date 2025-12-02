@@ -1,7 +1,7 @@
 <Layouts.app flash={@flash} current_scope={@current_scope}>
   <.header>
-    Edit Note {@note.id}
-    <:subtitle>Use this form to manage note records in your database.</:subtitle>
+    Edit Note
+    <:subtitle>Change details or content of your note.</:subtitle>
   </.header>
 
   <.note_form changeset={@changeset} action={~p"/notes/#{@note}"} return_to={~p"/notes"} />
