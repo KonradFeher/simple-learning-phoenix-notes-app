@@ -11,10 +11,12 @@ defmodule Notes.Content.Note do
 
     many_to_many :authors, Notes.Accounts.User,
       join_through: "notes_authors",
-      on_replace: :delete
+      on_replace: :delete,
+      on_delete: :delete_all
     many_to_many :sharees, Notes.Accounts.User,
      join_through: "notes_sharees",
-      on_replace: :delete
+      on_replace: :delete,
+      on_delete: :delete_all
 
     timestamps(type: :utc_datetime)
   end

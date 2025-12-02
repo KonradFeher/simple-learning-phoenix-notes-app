@@ -9,7 +9,7 @@ defmodule NotesWeb.UserLive.Confirmation do
     <Layouts.app flash={@flash} current_scope={@current_scope}>
       <div class="mx-auto max-w-sm">
         <div class="text-center">
-          <.header>Welcome {@user.email}</.header>
+          <.header>Welcome {@user.name}</.header>
         </div>
 
         <.form

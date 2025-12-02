@@ -42,15 +42,18 @@ defmodule Notes.Content do
 
   """
   def list_notes(%Scope{} = scope) do
-    query = from n in Note,
-              distinct: true,
-              left_join: a in assoc(n, :authors),
-              left_join: s in assoc(n, :sharees),
-              where: n.user_id == ^scope.user.id
-                or a.id == ^scope.user.id
-                or s.id == ^scope.user.id
-                or n.public == true,
-              order_by: n.title
+    query =
+      from n in Note,
+        distinct: true,
+        left_join: a in assoc(n, :authors),
+        left_join: s in assoc(n, :sharees),
+        where:
+          n.user_id == ^scope.user.id or
+            a.id == ^scope.user.id or
+            s.id == ^scope.user.id or
+            n.public == true,
+        order_by: n.title
+
     Repo.all(query) |> Repo.preload([:authors, :sharees])
   end
 
@@ -78,6 +81,7 @@ defmodule Notes.Content do
       Note
       |> Repo.get!(id)
       |> Repo.preload([:authors, :sharees])
+
     if allowed_to_view?(note, scope.user.id) do
       note
     else
@@ -90,6 +94,7 @@ defmodule Notes.Content do
       Note
       |> Repo.get!(id)
       |> Repo.preload([:authors, :sharees])
+
     if note.public do
       note
     else
@@ -137,9 +142,9 @@ defmodule Notes.Content do
       {:error, :forbidden}
     else
       with {:ok, note = %Note{}} <-
-            note
-            |> Note.changeset(attrs)
-            |> Repo.update() do
+             note
+             |> Note.changeset(attrs)
+             |> Repo.update() do
         broadcast_note(scope, {:updated, note})
         {:ok, note}
       end
@@ -213,7 +218,6 @@ defmodule Notes.Content do
     Repo.update(changeset)
   end
 
-
   @doc """
   Adds a sharee to a Note.
   """
@@ -277,7 +281,7 @@ defmodule Notes.Content do
   end
 
   def allowed_to_view?(note, user_id) do
-    allowed_to_modify?(note, user_id) or note.public or Enum.any?(note.sharees, &(&1.id == user_id))
+    allowed_to_modify?(note, user_id) or note.public or
+      Enum.any?(note.sharees, &(&1.id == user_id))
   end
-
 end
