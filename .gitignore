@@ -35,3 +35,4 @@ notes-*.tar
 npm-debug.log
 /assets/node_modules/
 
+/grafana_data

@@ -30,12 +30,8 @@ defmodule NotesWeb.Router do
   # end
 
   # Enable LiveDashboard and Swoosh mailbox preview in development
-  if Application.compile_env(:notes, :dev_routes) do
-    # If you want to use the LiveDashboard in production, you should put
-    # it behind authentication and allow only admins to access it.
-    # If your application does not have an admins-only section yet,
-    # you can use Plug.BasicAuth to set up some basic authentication
-    # as long as you are also using SSL (which you should anyway).
+  # ? including this for prod as well, so I don't actually need to set up a mailer
+  # if Application.compile_env(:notes, :dev_routes) do
     import Phoenix.LiveDashboard.Router
 
     scope "/dev" do
@@ -44,7 +40,7 @@ defmodule NotesWeb.Router do
       live_dashboard "/dashboard", metrics: NotesWeb.Telemetry
       forward "/mailbox", Plug.Swoosh.MailboxPreview
     end
-  end
+  # end
 
   ## Authentication routes
 
@@ -78,4 +74,6 @@ defmodule NotesWeb.Router do
     post "/users/log-in", UserSessionController, :create
     delete "/users/log-out", UserSessionController, :delete
   end
+
+  forward "/metrics", PromEx.Plug, prom_ex_module: Notes.PromEx
 end

@@ -8,7 +8,7 @@ services:
       SECRET_KEY_BASE: "${SECRET_KEY_BASE}"
       DATABASE_URL: "${DATABASE_URL}"
       PHX_SERVER: "true"
-      PHX_HOST: "localhost"
+      PHX_HOST: "localhost"        # important: service name
       PORT: "8888"
     ports:
       - "8888:8888"
@@ -28,3 +28,25 @@ services:
     restart: always
     volumes:
       - ./pgdata:/var/lib/postgresql
+
+  prometheus:
+    image: prom/prometheus
+    volumes:
+      - ./prometheus.yml:/etc/prometheus/prometheus.yml
+    ports:
+      - "9090:9090"
+    depends_on:
+      - web
+
+  grafana:
+    image: grafana/grafana
+    restart: unless-stopped
+    user: '0'
+    volumes:
+      - ./grafana_data:/var/lib/grafana
+      - ./grafana/dashboards:/var/lib/grafana/dashboards
+      - ./grafana/provisioning:/etc/grafana/provisioning
+    ports:
+      - "3000:3000"
+    depends_on:
+      - prometheus

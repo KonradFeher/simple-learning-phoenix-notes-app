@@ -21,7 +21,7 @@ defmodule Notes.MixProject do
   def application do
     [
       mod: {Notes.Application, []},
-      extra_applications: [:logger, :runtime_tools]
+      extra_applications: [:logger, :runtime_tools, :swoosh]
     ]
   end
 
@@ -67,7 +67,8 @@ defmodule Notes.MixProject do
       {:gettext, "~> 0.26"},
       {:jason, "~> 1.2"},
       {:dns_cluster, "~> 0.2.0"},
-      {:bandit, "~> 1.5"}
+      {:bandit, "~> 1.5"},
+      {:prom_ex, "~> 1.11"}
     ]
   end
 

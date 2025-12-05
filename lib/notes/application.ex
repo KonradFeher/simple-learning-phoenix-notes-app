@@ -9,6 +9,7 @@ defmodule Notes.Application do
   def start(_type, _args) do
     children = [
       NotesWeb.Telemetry,
+      {Notes.PromEx, []},
       Notes.Repo,
       {DNSCluster, query: Application.get_env(:notes, :dns_cluster_query) || :ignore},
       {Phoenix.PubSub, name: Notes.PubSub},
