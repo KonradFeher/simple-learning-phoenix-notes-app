@@ -1,0 +1,30 @@
+services:
+  web:
+    build:
+      context: .
+      args:
+        VERSION: "${VERSION}"
+    environment:
+      SECRET_KEY_BASE: "${SECRET_KEY_BASE}"
+      DATABASE_URL: "${DATABASE_URL}"
+      PHX_SERVER: "true"
+      PHX_HOST: "localhost"
+      PORT: "8888"
+    ports:
+      - "8888:8888"
+    depends_on:
+      - postgres
+    command: >
+      sh -c "/app/bin/notes eval 'Notes.Release.migrate' &&
+            /app/bin/notes start"
+
+  postgres:
+    image: postgres
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_DB: notes
+      PGDATA: /var/lib/postgresql/data/pgdata
+    restart: always
+    volumes:
+      - ./pgdata:/var/lib/postgresql
