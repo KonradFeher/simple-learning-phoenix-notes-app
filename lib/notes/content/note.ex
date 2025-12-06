@@ -1,4 +1,7 @@
 defmodule Notes.Content.Note do
+  @moduledoc """
+  Note model.
+  """
   use Ecto.Schema
   import Ecto.Changeset
 

@@ -1,4 +1,8 @@
 defmodule Notes.Accounts.UserToken do
+  @moduledoc """
+  User token model.
+  """
+
   use Ecto.Schema
   import Ecto.Query
   alias Notes.Accounts.UserToken

@@ -1,4 +1,7 @@
 defmodule Notes.Accounts.UserNotifier do
+  @moduledoc """
+  Module handling user notification.
+  """
   import Swoosh.Email
 
   alias Notes.Mailer

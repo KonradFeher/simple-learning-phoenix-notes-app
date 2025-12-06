@@ -1,4 +1,8 @@
 defmodule NotesWeb.UserAuth do
+  @moduledoc """
+  Module handling user authentication.
+  """
+
   use NotesWeb, :verified_routes
 
   import Plug.Conn
