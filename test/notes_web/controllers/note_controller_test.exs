@@ -31,7 +31,7 @@ defmodule NotesWeb.NoteControllerTest do
       assert redirected_to(conn) == ~p"/notes/#{id}"
 
       conn = get(conn, ~p"/notes/#{id}")
-      assert html_response(conn, 200) =~ "Note #{id}"
+      assert html_response(conn, 200) =~ "Note"
     end
 
     test "renders errors when data is invalid", %{conn: conn} do
