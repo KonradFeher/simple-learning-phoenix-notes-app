@@ -81,10 +81,15 @@ defmodule NotesWeb.UserAuth do
     else
       conn = fetch_cookies(conn, signed: [@remember_me_cookie])
 
-      if token = conn.cookies[@remember_me_cookie] do
-        {token, conn |> put_token_in_session(token) |> put_session(:user_remember_me, true)}
-      else
-        nil
+      case conn.cookies[@remember_me_cookie] do
+        nil ->
+          nil
+
+        token ->
+          {token,
+          conn
+          |> put_token_in_session(token)
+          |> put_session(:user_remember_me, true)}
       end
     end
   end
