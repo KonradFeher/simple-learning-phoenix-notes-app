@@ -138,9 +138,7 @@ defmodule Notes.Content do
 
   """
   def update_note(%Scope{} = scope, %Note{} = note, attrs) do
-    if not allowed_to_modify?(note, scope.user.id) do
-      {:error, :forbidden}
-    else
+    if allowed_to_modify?(note, scope.user.id) do
       with {:ok, note = %Note{}} <-
              note
              |> Note.changeset(attrs)
@@ -148,6 +146,8 @@ defmodule Notes.Content do
         broadcast_note(scope, {:updated, note})
         {:ok, note}
       end
+    else
+      {:error, :forbidden}
     end
   end
 
@@ -182,9 +182,7 @@ defmodule Notes.Content do
       |> Repo.get!(note_id)
       |> Repo.preload(:authors)
 
-    if not allowed_to_modify?(note, acting_user_id) do
-      {:error, :forbidden}
-    else
+    if allowed_to_modify?(note, acting_user_id) do
       user = Repo.get!(User, new_author_id)
 
       changeset =
@@ -193,6 +191,8 @@ defmodule Notes.Content do
         |> Ecto.Changeset.put_assoc(:authors, note.authors ++ [user])
 
       Repo.update(changeset)
+    else
+      {:error, :forbidden}
     end
   end
 
@@ -213,7 +213,7 @@ defmodule Notes.Content do
     changeset =
       note
       |> Ecto.Changeset.change()
-      |> Ecto.Changeset.put_assoc(:authors, IO.inspect(new_authors))
+      |> Ecto.Changeset.put_assoc(:authors, new_authors)
 
     Repo.update(changeset)
   end
