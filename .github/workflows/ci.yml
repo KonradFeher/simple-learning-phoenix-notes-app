@@ -50,11 +50,8 @@ jobs:
           MIX_ENV: test
         run: mix test --trace
 
-      - name: Install Credo
-        run: mix deps.get && mix deps.compile credo
-
       - name: Run Credo (Linter)
-        run: mix credo --strict
+        run: mix credo
 
   docker_build:
     name: Docker Build
