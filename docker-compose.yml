@@ -8,7 +8,7 @@ services:
       SECRET_KEY_BASE: "${SECRET_KEY_BASE}"
       DATABASE_URL: "${DATABASE_URL}"
       PHX_SERVER: "true"
-      PHX_HOST: "localhost"        # important: service name
+      PHX_HOST: "localhost"
       PORT: "8888"
     ports:
       - "8888:8888"
@@ -42,11 +42,33 @@ services:
     image: grafana/grafana
     restart: unless-stopped
     user: '0'
+    environment:
+      - GF_SERVER_HTTP_PORT=3003
     volumes:
       - ./grafana_data:/var/lib/grafana
       - ./grafana/dashboards:/var/lib/grafana/dashboards
       - ./grafana/provisioning:/etc/grafana/provisioning
     ports:
-      - "3000:3000"
+      - "3003:3003"
     depends_on:
       - prometheus
+
+  caddy:
+    image: caddy:latest
+    container_name: caddy
+    restart: unless-stopped
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - ./Caddyfile:/etc/caddy/Caddyfile
+      - caddy_data:/data
+      - caddy_config:/config
+    depends_on:
+      - web
+      - grafana
+      - prometheus
+
+volumes:
+  caddy_data:
+  caddy_config:

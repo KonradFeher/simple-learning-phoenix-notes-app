@@ -1,16 +1,3 @@
-# Find eligible builder and runner images on Docker Hub. We use Ubuntu/Debian
-# instead of Alpine to avoid DNS resolution issues in production.
-#
-# https://hub.docker.com/r/hexpm/elixir/tags?name=ubuntu
-# https://hub.docker.com/_/ubuntu/tags
-#
-# This file is based on these images:
-#
-#   - https://hub.docker.com/r/hexpm/elixir/tags - for the build image
-#   - https://hub.docker.com/_/debian/tags?name=trixie-20251117-slim - for the release image
-#   - https://pkgs.org/ - resource for finding needed packages
-#   - Ex: docker.io/hexpm/elixir:1.17.3-erlang-27.3.4.6-debian-trixie-20251117-slim
-#
 ARG ELIXIR_VERSION=1.17.3
 ARG OTP_VERSION=27.3.4.6
 ARG DEBIAN_VERSION=trixie-20251117-slim

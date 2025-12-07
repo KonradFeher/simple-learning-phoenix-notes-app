@@ -1,0 +1,40 @@
+services:
+  web:
+    build:
+      context: .
+      dockerfile: Dockerfile.dev
+    image: notes-dev-web
+    environment:
+      MIX_ENV: dev
+      AUTO_MIGRATE: "true"
+      SECRET_KEY_BASE: "${SECRET_KEY_BASE}"
+      DATABASE_URL: "${DATABASE_URL}"
+      PHX_SERVER: "true"
+      PHX_HOST: "localhost"
+      PORT: "8888"
+    volumes:
+      - ./:/app:delegated
+      - deps_cache:/app/deps
+      - _build_cache:/app/_build
+    ports:
+      - "8888:8888"
+    depends_on:
+      - postgres
+
+  postgres:
+    image: postgres
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_DB: notes
+      PGDATA: /var/lib/postgresql/data/pgdata
+    restart: always
+    volumes:
+      - ./pgdata:/var/lib/postgresql
+    ports:
+      - "5432:5432"
+
+volumes:
+  pgdata_dev:
+  deps_cache:
+  _build_cache:

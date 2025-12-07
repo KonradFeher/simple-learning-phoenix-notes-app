@@ -1,0 +1,11 @@
+notes.devops.157451.xyz {
+    reverse_proxy web:4000
+}
+
+grafana.devops.157451.xyz {
+    reverse_proxy grafana:3003
+}
+
+prometheus.devops.157451.xyz {
+    reverse_proxy prometheus:9090
+}

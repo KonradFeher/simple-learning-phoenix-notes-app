@@ -1,0 +1,35 @@
+FROM hexpm/elixir:1.17.3-erlang-27.3.4.6-debian-trixie-20251117-slim AS dev
+
+RUN apt-get update \
+  && apt-get install -y --no-install-recommends \
+      build-essential git curl inotify-tools nodejs npm locales ca-certificates \
+  && rm -rf /var/lib/apt/lists/*
+
+RUN sed -i '/en_US.UTF-8/s/^# //g' /etc/locale.gen && locale-gen
+ENV LANG=en_US.UTF-8
+ENV LANGUAGE=en_US:en
+ENV LC_ALL=en_US.UTF-8
+
+RUN useradd -m appuser
+USER appuser
+WORKDIR /app
+
+RUN mix local.hex --force && mix local.rebar --force
+
+COPY --chown=appuser:appuser mix.exs mix.lock ./
+COPY --chown=appuser:appuser config ./config
+
+RUN mix deps.get
+RUN mix deps.compile
+
+COPY --chown=appuser:appuser lib ./lib
+COPY --chown=appuser:appuser assets ./assets
+COPY --chown=appuser:appuser priv ./priv
+
+COPY --chown=appuser:appuser entrypoint.dev.sh ./entrypoint.dev.sh
+RUN chmod +x ./entrypoint.dev.sh
+
+EXPOSE 4000
+ENV MIX_ENV=dev
+
+CMD ["./entrypoint.dev.sh"]
