@@ -1,5 +1,5 @@
 notes.devops.157451.xyz {
-    reverse_proxy web:4000
+    reverse_proxy web:8888
 }
 
 grafana.devops.157451.xyz {
