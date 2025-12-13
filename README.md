@@ -14,24 +14,29 @@
 - `cd simple-learning-phoenix-notes-app`
 - `make up` (This should get you up and running, more commands available in Makefile)
 
-- Access the services in your browser:
+- Access the site in your browser:
   - Notes app: http://localhost:8888
-  - Grafana: http://localhost:9090
-  - Prometheus: http://localhost:3003
-
+  
 ---
 
-#### IP addresses and port numbers (Docker Compose / local dev)
+#### Accessible at
+
+##### (local dev)
 ```
     Web app: localhost:8888
-    Prometheus: localhost:9090
-    Grafana: localhost:3003
     Postgres DB: localhost:5432
 ```
 
+##### (deployed, prod)
+```
+    Web app: notes.devops.157451.xyz
+    Grafana: grafana.devops.157451.xyz (admin, admin)
+    Prometheus: prometheus.devops.157451.xyz
+```
+[Grafana dashboard](https://grafana.devops.157451.xyz/d/adxsbv2/main-dashboard-update)
 
 > Note: in production, all ports are proxied via Caddy and TLS-enabled domains.
-> This should be accessible via `notes.devops.157451.xyz` if my tiny shared CPU VPS holds out. (prone to crashing, not usable as of yet, lacking a mailer)
+> This should be accessible if my tiny shared CPU VPS holds out. (prone to crashing, not usable as of yet, lacking a mailer)
 
 ---
 
@@ -67,8 +72,7 @@ Features:
   - CD
     - Deploys application to my Kamatera VPS
 - **Terraform** (DNS management via Porkbun)
-- **Prometheus**
-- **Grafana**
+- **Prometheus**, **Grafana** (for monitoring, in production composition)
 - **Caddy** (TLS, reverse proxy)
 - **Makefile** (helper commands for local development)
 
