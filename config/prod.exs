@@ -7,7 +7,7 @@ import Config
 # before starting your production server.
 config :notes, NotesWeb.Endpoint,
   cache_static_manifest: "priv/static/cache_manifest.json",
-  url: [host: "localhost", port: 8888],
+  url: [host: "0.0.0.0", port: 8888],
   check_origin: false
 
 # just using the local solution for this

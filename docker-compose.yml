@@ -8,7 +8,7 @@ services:
       SECRET_KEY_BASE: "${SECRET_KEY_BASE}"
       DATABASE_URL: "${DATABASE_URL}"
       PHX_SERVER: "true"
-      PHX_HOST: "localhost"
+      PHX_HOST: "0.0.0.0"
       PORT: "8888"
     ports:
       - "8888:8888"
