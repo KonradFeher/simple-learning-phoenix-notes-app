@@ -1,18 +1,84 @@
-# Notes
+# Collab Notes Web App
+### A project using DevOps tooling
+---
 
-To start your Phoenix server:
+#### Requirements to run locally
 
-* Run `mix setup` to install and setup dependencies
-* Start Phoenix endpoint with `mix phx.server` or inside IEx with `iex -S mix phx.server`
+- git
+- docker, docker compose
+- Your user should be part of the `docker` (`sudo usermod -aG docker $USER && newgrp docker`), to avoid having to sudo
 
-Now you can visit [`localhost:4000`](http://localhost:4000) from your browser.
+#### Usage
 
-Ready to run in production? Please [check our deployment guides](https://hexdocs.pm/phoenix/deployment.html).
+- `git clone https://github.com/KonradFeher/simple-learning-phoenix-notes-app`
+- `cd simple-learning-phoenix-notes-app`
+- `make up` (This should get you up and running, more commands available in Makefile)
 
-## Learn more
+- Access the services in your browser:
+  - Notes app: http://localhost:8888
+  - Grafana: http://localhost:9090
+  - Prometheus: http://localhost:3003
 
-* Official website: https://www.phoenixframework.org/
-* Guides: https://hexdocs.pm/phoenix/overview.html
-* Docs: https://hexdocs.pm/phoenix
-* Forum: https://elixirforum.com/c/phoenix-forum
-* Source: https://github.com/phoenixframework/phoenix
+---
+
+#### IP addresses and port numbers (Docker Compose / local dev)
+```
+    Web app: localhost:8888
+    Prometheus: localhost:9090
+    Grafana: localhost:3003
+    Postgres DB: localhost:5432
+```
+
+
+> Note: in production, all ports are proxied via Caddy and TLS-enabled domains.
+> This should be accessible via `notes.devops.157451.xyz` if my tiny shared CPU VPS holds out. (prone to crashing, not usable as of yet, lacking a mailer)
+
+---
+
+#### About the application
+
+A web application built in **Elixir/Phoenix** for note-taking and basic CRUD functionality.  
+
+Features:
+
+- Create, read, update, and delete notes.
+- User authentication with email/password and "remember me".
+- Option to collaborate with other users on notes.
+- Metrics exported via **PromEx** and available in **Prometheus**.
+- Dashboards and visualization in **Grafana**.
+
+---
+
+#### Technologies used
+
+Backend: **Elixir**, **Phoenix**, **Ecto**
+Frontend: **TailwindCSS**, **esbuild**, **Phoenix LiveView**  
+Database: PostgreSQL
+---
+
+#### DevOps tools used
+
+- **Docker** (for both local dev and production deployments)
+- **Git**
+- **GitHub Actions**
+  - CI
+    - Runs tests
+    - Runs **Credo** static code analysis
+  - CD
+    - Deploys application to my Kamatera VPS
+- **Terraform** (DNS management via Porkbun)
+- **Prometheus**
+- **Grafana**
+- **Caddy** (TLS, reverse proxy, rate limiting)
+- **Makefile** (helper commands for local development)
+
+---
+
+#### Notes on Development
+
+- Use the `docker-compose.dev.yml` for running locally with hot reload (`mix phx.server`).
+- The production setup uses a Phoenix release inside Docker.
+- To seed the database in dev, `entrypoint.dev.sh` automatically runs migrations and seeds.
+- Metrics are exposed on `/metrics` and can be scraped by Prometheus.
+- Caddy handles TLS and routing for all subdomains in production.
+

@@ -31,8 +31,6 @@ services:
     restart: always
     volumes:
       - ./pgdata:/var/lib/postgresql
-    ports:
-      - "5432:5432"
 
 volumes:
   pgdata_dev:

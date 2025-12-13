@@ -1,20 +1,24 @@
 .PHONY: up down restart logs build test ci migrate seed
 
+COMPOSE_FILE=docker-compose.dev.yml
+DC=docker compose -f $(COMPOSE_FILE)
+
 up:
-	docker compose up -d
+	./scripts/init_dirs.sh
+	$(DC) up -d
 
 down:
-	docker compose down
+	$(DC) down
 
 restart:
-	docker compose down
-	docker compose up -d
+	$(DC) down
+	$(DC) up -d
 
 logs:
-	docker compose logs -f
+	$(DC) logs -f
 
 build:
-	docker compose build
+	$(DC) build
 
 test:
 	mix test
@@ -24,7 +28,7 @@ ci:
 	mix credo
 
 migrate:
-	docker compose exec web mix ecto.migrate
+	$(DC) exec web mix ecto.migrate
 
 seed:
-	docker compose exec web mix run priv/repo/seeds.exs
+	$(DC) exec web mix run priv/repo/seeds.exs
