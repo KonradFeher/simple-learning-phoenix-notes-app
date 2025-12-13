@@ -1,11 +1,57 @@
+{
+    email you@example.com
+
+    log {
+        output stdout
+        format json
+    }
+}
+
+(common) {
+    encode zstd gzip
+
+    header {
+        # Security headers
+        X-Content-Type-Options nosniff
+        X-Frame-Options DENY
+        Referrer-Policy no-referrer
+        Strict-Transport-Security "max-age=31536000; includeSubDomains; preload"
+    }
+
+    # 100 requests per minute per IP
+    rate_limit {
+        zone default {
+            key {remote_host}
+            events 100
+            window 1m
+        }
+    }
+
+    request_body {
+        max_size 10MB
+    }
+}
+
 notes.devops.157451.xyz {
-    reverse_proxy web:8888
+    import common
+
+    reverse_proxy web:8888 {
+        health_uri /health
+        transport http {
+            read_timeout 30s
+            write_timeout 30s
+        }
+    }
 }
 
 grafana.devops.157451.xyz {
+    import common
+
     reverse_proxy grafana:3003
 }
 
 prometheus.devops.157451.xyz {
+    import common
+
     reverse_proxy prometheus:9090
 }
