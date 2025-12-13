@@ -40,11 +40,14 @@ jakab = Repo.insert!(%User{
 })
 
 
-noteA1 = Repo.insert!(%Note{title: "Note A 1", content: "Owned by Alice", public: true, type: :plaintext, user_id: alice.id})
+noteA1 = Repo.insert!(%Note{title: "Alice's ideas for vacatin", content: "I am looking for some ideas on what to do for vacation, help me out!", public: true, type: :plaintext, user_id: alice.id})
+noteA2 = Repo.insert!(%Note{title: "Shopping list", content: "bread, milk, eggs, sausage, butter, coffee...", public: false, type: :plaintext, user_id: alice.id})
 
-noteA2 = Repo.insert!(%Note{title: "Note A 2", content: "Owned by Alice 2", public: false, type: :plaintext, user_id: alice.id})
+noteB1 = Repo.insert!(%Note{title: "How does this work", content: "is this Google?..", public: false, type: :plaintext, user_id: bob.id})
 
-noteB1 = Repo.insert!(%Note{title: "Note B 1", content: "Owned by Bob", public: false, type: :markdown, user_id: bob.id})
+noteC1 = Repo.insert!(%Note{title: "We can now use Markdown!", content: "# Title  \n## Subtitle  \n _fancy italics_, **bolds**, ~~strikethrough!~~  \nLists:  \n- Item 1  \n- Item 2  \n- Item 3  \n I think tables and images should also work!!", public: true, type: :plaintext, user_id: john.id})
+
+noteD1 = Repo.insert!(%Note{title: "Look! Scrungly!", content: "This is my cat scrungly and I will collect more images here about him!!  \n ![Scrugly Pose](https://i.kym-cdn.com/photos/images/newsfeed/002/349/699/077.jpg)", public: true, type: :plaintext, user_id: jakab.id})
 
 noteA1 = Repo.preload(noteA1, :authors)
 noteA2 = Repo.preload(noteA2, :authors)
