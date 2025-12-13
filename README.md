@@ -49,11 +49,11 @@ Features:
 
 ---
 
-#### Technologies used
+#### Technologies used  
 
-Backend: **Elixir**, **Phoenix**, **Ecto**
-Frontend: **TailwindCSS**, **esbuild**, **Phoenix LiveView**  
-Database: PostgreSQL
+- Backend: **Elixir**, **Phoenix**, **Ecto**
+- Frontend: **TailwindCSS**, **esbuild**, **Phoenix LiveView**  
+- Database: PostgreSQL
 ---
 
 #### DevOps tools used
@@ -69,16 +69,8 @@ Database: PostgreSQL
 - **Terraform** (DNS management via Porkbun)
 - **Prometheus**
 - **Grafana**
-- **Caddy** (TLS, reverse proxy, rate limiting)
+- **Caddy** (TLS, reverse proxy)
 - **Makefile** (helper commands for local development)
 
 ---
-
-#### Notes on Development
-
-- Use the `docker-compose.dev.yml` for running locally with hot reload (`mix phx.server`).
-- The production setup uses a Phoenix release inside Docker.
-- To seed the database in dev, `entrypoint.dev.sh` automatically runs migrations and seeds.
-- Metrics are exposed on `/metrics` and can be scraped by Prometheus.
-- Caddy handles TLS and routing for all subdomains in production.
 
