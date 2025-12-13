@@ -1,5 +1,5 @@
 {
-    email you@example.com
+    email konradfeher@outlook.com
 
     log {
         output stdout
@@ -17,16 +17,7 @@
         Referrer-Policy no-referrer
         Strict-Transport-Security "max-age=31536000; includeSubDomains; preload"
     }
-
-    # 100 requests per minute per IP
-    rate_limit {
-        zone default {
-            key {remote_host}
-            events 100
-            window 1m
-        }
-    }
-
+    
     request_body {
         max_size 10MB
     }
