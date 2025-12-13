@@ -1,6 +1,4 @@
 {
-    email konradfeher@outlook.com
-
     log {
         output stdout
         format json
@@ -17,17 +15,14 @@
         Referrer-Policy no-referrer
         Strict-Transport-Security "max-age=31536000; includeSubDomains; preload"
     }
-    
+
     request_body {
         max_size 10MB
     }
 }
 
 notes.devops.157451.xyz {
-    import common
-
     reverse_proxy web:8888 {
-        health_uri /health
         transport http {
             read_timeout 30s
             write_timeout 30s
@@ -36,13 +31,9 @@ notes.devops.157451.xyz {
 }
 
 grafana.devops.157451.xyz {
-    import common
-
     reverse_proxy grafana:3003
 }
 
 prometheus.devops.157451.xyz {
-    import common
-
     reverse_proxy prometheus:9090
 }
